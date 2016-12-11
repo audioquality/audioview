@@ -1,0 +1,24 @@
+#!/bin/bash
+# 
+# Produce one spectrogram for all flac files in current directory.
+#
+# concatenate files, downmix to mono
+# use 96 dB (16bit) range for z color axis resolution
+# use 1 second per pixel x axis resolution 
+#
+# by dev@clixt.net, License: WTFPL
+#
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+#
+
+if [ ! -x $(which sox) ]; then
+  echo "Please install sox first."
+  exit 1
+fi
+
+sox --no-show-progress --no-dither --multi-threaded --buffer 131072 *.flac -n channels 1 spectrogram -L -R 10:22k -X 1 -y 1200 -z 96 -w Hann -W 10 -t "" -c "" -o spectrum.png
+
+# view result
+#feh spectrum.png &

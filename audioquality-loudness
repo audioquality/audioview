@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Create loudness report file for all audio files in current directory,
+# based on the EBU-R128 standard. Output formatting should look similar to DR14 report.
+#
+# needs: https://github.com/jiixyj/loudness-scanner
+#        exiftool
+#        tofrodos
+# 
+# by ClixT, dev@clixt.net
+# License: WTFPL
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+#
+LFILE="loudness.txt"
+
+if [ ! -x `which loudness` ]; then
+  echo -e "Missing the 'loudness' scanner.\nInstall from here: https://github.com/jiixyj/loudness-scanner"
+  exit 1
+fi
+
+# find one audio file
+AUDIOFILE=`find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f' -quit`
+if [ ! -s "$AUDIOFILE" ]; then
+  echo "No audio file found in the working directory, exiting."
+  exit 1
+fi
+CNTFILES=`find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f\n' | wc -l`
+
+echo -n "Analyzing audio loudness... "
+FILEINFO=`exiftool -S "$AUDIOFILE" 2>/dev/null`
+ARTIST=`echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//'`
+ALBUM=`echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//'`
+BITRATE=`echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//'`
+SAMPLERATE=`echo "$FILEINFO" | grep -i -m 1 SampleRate: | sed 's/.*:\s*//'`
+BITSPS=`echo "$FILEINFO" | grep -i -m 1 BitsPerSample: | sed 's/.*:\s*//'`
+
+echo "----------------------------------------------------------------------------------------------" >$LFILE
+echo " Analyzed: $ALBUM / Artist: $ARTIST" >>$LFILE
+echo "----------------------------------------------------------------------------------------------" >>$LFILE
+# scan all audio in current directory
+START=$(date +%s.%N)
+# WARNING: with calculation of true peaks, execution takes about 3x longer!!!
+loudness scan -l -p dbtp *flac *mp3 *ogg *wav 2>&1 | sed 's/\x0D/\x0A/g' | grep ',' | sed 's/---*/\n Album total:/' | sed 's/^/ /g' >>$LFILE
+END=$(date +%s.%N)
+echo "----------------------------------------------------------------------------------------------" >>$LFILE
+echo " Number of files:     $CNTFILES" >>$LFILE
+echo " Sampling rate:       $SAMPLERATE" >>$LFILE
+if [ "$BITRATE" ]; then
+  echo " Sample file bitrate: $BITRATE" >>$LFILE
+fi
+if [ "$BITSPS" ]; then
+  echo " Bits per sample:     $BITSPS" >>$LFILE
+fi
+echo "----------------------------------------------------------------------------------------------" >>$LFILE
+echo " Audio Loudness Report as defined by the EBU-R128 standard." >>$LFILE
+echo " More Info: https://tech.ebu.ch/loudness" >>$LFILE
+echo " Implementation: https://github.com/jiixyj/loudness-scanner" >>$LFILE
+loudness --version | sed 's/^/ /' >>$LFILE
+echo "==============================================================================================" >>$LFILE
+# make line endings DOS compatible LF->CRLF
+#sed -i 's/$/\x0D/g' "$LFILE"
+if [ -x `which todos` ]; then
+  todos "$LFILE"
+fi
+
+echo -n "finished in [s.ms]: "
+echo "scale=3; ($END - $START)/1" | bc
+
+cat "$LFILE"
+
+exit 0
