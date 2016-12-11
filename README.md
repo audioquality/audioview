@@ -114,10 +114,10 @@ Show the difference between the original release and the remastered edition of t
     $ audioview "02 - Bad Medicine.flac"
 
 Original version released in 1988. Beautiful DR13 dynamics, no clipping issues, lively sound:
-<img src="doc/badmedicine1988.png" width="1585" height="512">
+[ ![](doc/badmedicine1988.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
 
 Same song, later version remastered in 2010. Dynamically compressed and clipped. The result is in comparison boring, bricked, inferior-quality sound:
-<img src="doc/badmedicine2010.png" width="1585" height="512">
+[ ![](doc/badmedicine2010.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine2010.png)
 
 ---
 ## License
