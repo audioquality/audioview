@@ -37,11 +37,11 @@ generates [EBU-R128](https://tech.ebu.ch/loudness) loudness report and saves it 
 
 The results contain:
 
- * LUFS (Loudness Units Full Scale) - Absolute Loudness Level, as defined by the [EBU Tech spec 3341](https://tech.ebu.ch/publications/tech3341)
+ * LUFS (Loudness Units Full Scale) - Absolute Loudness Level, as defined by the [EBU Tech spec 3341](https://tech.ebu.ch/publications/tech3341). The [recommended value](https://youtu.be/BhA7Vy3OPbc?t=2213) for production is around -16 LUFS or less, but a higher value does not necessarily indicate distortion.
  * LU (Loudness Units) - Loudness Range, as defined by the [EBU Tech spec 3342](https://tech.ebu.ch/publications/tech3342)
- * dBTP - True Peak Level value in dB. This one is more CPU heavy to calculate.
+ * dBTP - True Peak Level value in dB. This should always be less than 0, a positive value indicates [distortion](https://youtu.be/BhA7Vy3OPbc?t=159) due to not enough headroom. NOTE: This one is CPU heavy to calculate. 
 
-It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-scanner). For more on loudness and the EBU-R128 standard, see: https://www.youtube.com/watch?v=iuEtQqC-Sqo
+It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-scanner). For more on loudness and the EBU-R128 parameters, see: https://www.youtube.com/watch?v=iuEtQqC-Sqo
 
 ###audioquality-spectrogram###
 generates a single _spectrogram.png_ file for all _flac_ files in current directory.
@@ -114,10 +114,10 @@ Show the difference between the original release and the remastered edition of t
     $ audioview "02 - Bad Medicine.flac"
 
 Original version released in 1988. Beautiful DR13 dynamics, no clipping issues, lively sound:
-![](doc/badmedicine1988.png)
+[ ![](doc/badmedicine1988.png) ](doc/badmedicine1988.png)
 
 Same song, later version remastered in 2010. Dynamically compressed and clipped. The result is in comparison boring, bricked, inferior-quality sound:
-![](doc/badmedicine2010.png)
+[ ![](doc/badmedicine2010.png) ](doc/badmedicine2010.png)
 
 ---
 ## License
