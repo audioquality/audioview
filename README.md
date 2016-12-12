@@ -4,12 +4,12 @@
 > 
 > <cite>-- [Floyd Toole, consultant to Harman, 16. Apr. 2016](https://youtu.be/zrpUDuUtxPM?t=4182)</cite>
 
- - But it is possible to identify a low-quality song without having to listen to it first? Is the newer, remastered album even worth listening to? 
+ - But it is possible to identify a low-quality song without having to listen to it first? Is the newer, remastered album even worth listening to?
  - Do your new speakers sound distorted, maybe even worse than the old ones? Is it the speakers, or lousy mastering of your favourite music?
  - Have you ever tried to get rid of a sound resonance, by switching cables, players, speakers, fixing furniture... just to find out that the problem is in the recording?
 
 In any case, it's a good idea to make sure that your audio collection is not the problem. Especially before you start buying new equipment, speakers, headphones...
-There is a lot of theory out there. Subjective opinions, music industry myths, a lot of confusion scattered all over forums.
+There is a lot of theory out there. Subjective opinions, music industry myths, a lot of confusion scattered all over the forums.
 
 ... so how can you find out what recordings have the potential to sound good?
 
@@ -70,9 +70,9 @@ follow instructions here: http://dr14tmeter.sourceforge.net/index.php/Main_Page
 official instructions: https://github.com/jiixyj/loudness-scanner#installation
 
 NOTE:
-On Debian Testing, compilation failed due to incompatible libinput_ffmpeg code. Running ```make install``` is not recommended. It failed to install the _loudness_ binaries, and also could break _ffmpeg_ by installing local version of libebur128.
+On Debian Testing, compilation fails due to incompatible libinput_ffmpeg code. Running ```make install``` is not recommended - it failed to install the _loudness_ binaries, and also could break _ffmpeg_ by installing local version of libebur128.
 
-The workaround is to disable ffmpeg input, and copy the binaries after compilation manually. This worked on Debian:
+The workaround is to disable the ffmpeg input, and copy the binaries after compilation manually. This worked on Debian:
 
     $ mkdir build; cd build
     $ cmake -DDISABLE_FFMPEG:BOOL=yes ..
@@ -113,10 +113,10 @@ Show the difference between the original release and the remastered edition of t
     $ audioview "CD1 - 06 - Bad Medicine.flac"
     $ audioview "02 - Bad Medicine.flac"
 
-Original version released in 1988. Beautiful DR13 dynamics, no clipping issues, lively sound:
+Original version released in 1988. Beautiful [DR13](http://dr.loudness-war.info/) dynamics, no clipping issues, lively and enjoyable sound:
 [ ![](doc/badmedicine1988s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
 
-Same song, later version remastered in 2010. Dynamically compressed and clipped. The result is in comparison boring, bricked, inferior-quality sound:
+Same song, remastered in 2010, dynamically compressed and clipped. This low-quality bricked release sounds in comparison [wimpy, small, distorted](https://youtu.be/u9Fb3rWNWDA?t=859) and boring:
 [ ![](doc/badmedicine2010s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine2010.png)
 
 ---
