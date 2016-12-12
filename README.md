@@ -114,10 +114,10 @@ Show the difference between the original release and the remastered edition of t
     $ audioview "02 - Bad Medicine.flac"
 
 Original version released in 1988. Beautiful DR13 dynamics, no clipping issues, lively sound:
-[ ![](doc/badmedicine1988.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
+[ ![](doc/badmedicine1988s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
 
 Same song, later version remastered in 2010. Dynamically compressed and clipped. The result is in comparison boring, bricked, inferior-quality sound:
-[ ![](doc/badmedicine2010.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine2010.png)
+[ ![](doc/badmedicine2010s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine2010.png)
 
 ---
 ## License
@@ -128,7 +128,7 @@ as published by Sam Hocevar. See http://www.wtfpl.net for more details.
 
 ## Contributing
 
-If you have a feature request or want to report a bug, we'd be happy to hear
+If you want to report a bug, we'd be happy to hear
 from you. Please either [raise an issue](https://github.com/clixt.net/audioquality/issues), or fork the project and send us a pull request.
 
 ## Authors
