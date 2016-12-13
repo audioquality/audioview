@@ -13,12 +13,12 @@
 # as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
 #
 
-if [ ! -x $(which sox) ]; then
-  echo "Please install sox first."
+if [ ! -x "$(which sox)" ]; then
+  echo "Please install sox"
   exit 1
 fi
 
-sox --no-show-progress --no-dither --multi-threaded --buffer 131072 *.flac -n channels 1 spectrogram -L -R 10:22k -X 1 -y 1200 -z 96 -w Hann -W 10 -t "" -c "" -o spectrum.png
+sox --no-show-progress --no-dither --multi-threaded --buffer 131072 *.flac -n channels 1 spectrogram -R 10:22k -X 1 -y 512 -z 96 -w Hann -W 10 -t "" -c "" -o spectrogram.png
 
 # view result
-#feh spectrum.png &
+#feh spectrogram.png &

@@ -33,7 +33,7 @@ Audioview uses _loudness.txt_ file to display the loudness information, and _dr1
 In case of an error there is no visual notification, an error message might appear on the terminal.
 
 ###audioquality-loudness###
-generates [EBU-R128](https://tech.ebu.ch/loudness) loudness report and saves it to _loudness.txt_ file. This is later used by audioview to display loudness metadata in the overlay. It is meant to be run from the terminal, from the directory with audio files to be analyzed (eg. album directory). The output formatting is made to look similar to a DR14 report file.
+generates [EBU-R128](https://tech.ebu.ch/loudness) loudness report for all audio files in current directory and saves it to _loudness.txt_ file. This is later used by audioview to display loudness metadata in the overlay. It is meant to be run from the terminal. The output formatting is made to look similar to a DR14 report file.
 
 The results contain:
 
@@ -44,12 +44,18 @@ The results contain:
 It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-scanner). For more on loudness and the EBU-R128 parameters, see: https://www.youtube.com/watch?v=iuEtQqC-Sqo
 
 ###audioquality-spectrogram###
-generates a single _spectrogram.png_ file for all _flac_ files in current directory.
+generates a single spectrogram, for all _flac_ files in current directory combined. The the color map resolution is 96dB to represent the full scale of 16 bit audio.  The time resolution is constant; 1s of audio per pixel on the X axis. The Y axis shows frequency up to 22 kHz to match the [CD sampling rate](https://en.wikipedia.org/wiki/Compact_Disc_Digital_Audio#Sample_rate).
 
-This is a simple wrapper for _sox_.
+NOTE1: this is VERY slow! It is much faster to identify low-quality recordings by a quick look at [#audioview].
+
+NOTE2: frequency on the Y axis is in linear scale, not logarithmic! This way the spectrogram does not resemble what we hear, but may help to identify high frequency issues, like incorrect use of low-pass filters.
+
+This script is a simple wrapper for _sox_.
 
 ---
 ## Installation
+
+These tools are simple BASH scripts, just place or link them into your $PATH directory, an install the dependencies:
 
 ### Debian
 
@@ -69,10 +75,9 @@ follow instructions here: http://dr14tmeter.sourceforge.net/index.php/Main_Page
 
 official instructions: https://github.com/jiixyj/loudness-scanner#installation
 
-NOTE:
-On Debian Testing, compilation fails due to incompatible libinput_ffmpeg code. Running ```make install``` is not recommended - it failed to install the _loudness_ binaries, and also could break _ffmpeg_ by installing local version of libebur128.
+NOTE: On Debian Testing the compilation fails due to incompatible libinput_ffmpeg code. Running ```make install``` is not recommended - it fails to install the _loudness_ binaries, and also could break _ffmpeg_ by installing local version of libebur128.
 
-The workaround is to disable the ffmpeg input, and copy the binaries after compilation manually. This worked on Debian:
+The workaround is to disable the ffmpeg input, compile, and then copy the binaries manually. This worked on Debian:
 
     $ mkdir build; cd build
     $ cmake -DDISABLE_FFMPEG:BOOL=yes ..
@@ -84,21 +89,21 @@ The workaround is to disable the ffmpeg input, and copy the binaries after compi
 ---
 ## Usage
 
+
 ###audioquality-loudness###
 
-Syntax:
+Syntax: ```$ audioquality-loudness```
 
-    $ audioquality-loudness
-
-Generates _loudness.txt_, a loudness report for all audio files in current directory.
 
 ###audioquality-spectrogram###
 
-Syntax:
+Syntax: ```$ audioquality-spectrogram```
 
-    $ audioquality-spectrogram
+**Example:**
 
-Generates one _spectrogram.png_ file for all audio files in current directory.
+Running the script in a directory with 2 example files, different versions of the same song (Bon Jovi - Bad Medicine). The first half of the spectrogram shows the version released in 1988: no high frequency issues, all is kept nicely below 21 kHz to avoid aliasing distortion. The second half shows the 2010 remastered version: The high frequencies go all the way to the top during the whole song; in this case it was caused by careless digital clipping.
+![](doc/badmedicine-spectrogram.png)
+
 
 ###audioview###
 
@@ -108,10 +113,10 @@ Syntax:
 
 **Example:**
 
-Show the difference between the original release and the remastered edition of the same song:
+Show the difference between the original and the remastered release:
 
-    $ audioview "CD1 - 06 - Bad Medicine.flac"
     $ audioview "02 - Bad Medicine.flac"
+    $ audioview "CD1 - 06 - Bad Medicine.flac
 
 Original version released in 1988. Beautiful [DR13](http://dr.loudness-war.info/) dynamics, no clipping issues, lively and enjoyable sound:
 [ ![](doc/badmedicine1988s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
