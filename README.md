@@ -16,7 +16,7 @@ There is a lot of theory out there. Subjective opinions, music industry myths, a
 ---
 ##About##
 
-These simple Linux tools will help you to get a better unserstanding of your music collection. The goal is to get an quick overview about the quality of a local audio, giving you the ability to visually compare different songs and album releases. It helps to easily identify common cases of audio abuse, like dynamic range compression, limiting and clipping.
+These Linux tools will help you to get a better understanding of your music collection and the quality of locally stored audio. You can visually compare different songs and album releases, easily identify common cases of audio abuse, like dynamic range compression, limiting and clipping. The results can create a base for reviews of released albums from the audio quality perspective.
 
 ###audioview###
 shows a simplified waveform, in 200ms per pixel constant time resolution, of a given 16bit/44.1kHz single audio file (WAV, FLAC, MP3, OGG). Additional information about the audio quality is displayed as an overlay. It is meant to be associated with audio files in a file manager, in an audio player, or run directly from the terminal.
