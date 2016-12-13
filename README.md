@@ -46,7 +46,7 @@ It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-sca
 ###audioquality-spectrogram###
 generates a single spectrogram, for all _flac_ files in current directory combined. The the color map resolution is 96dB to represent the full scale of 16 bit audio.  The time resolution is constant; 1s of audio per pixel on the X axis. The Y axis shows frequency up to 22 kHz to match the [CD sampling rate](https://en.wikipedia.org/wiki/Compact_Disc_Digital_Audio#Sample_rate).
 
-NOTE1: this is VERY slow! It is much faster to identify low-quality recordings by a quick look at [#audioview].
+NOTE1: this is VERY slow! It is much faster to identify low-quality recordings by a quick look at [audioview](#audioview-1).
 
 NOTE2: frequency on the Y axis is in linear scale, not logarithmic! This way the spectrogram does not resemble what we hear, but may help to identify high frequency issues, like incorrect use of low-pass filters.
 
