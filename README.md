@@ -23,7 +23,7 @@ shows a simplified waveform, in 200ms per pixel constant time resolution, of a g
 
 Displayed metadata overlay is in the form of:
 
- * Artist - Album (Year) - Tracknr - Title
+ * Artist - Album (Year) - TrackNr - Title
  * Loudness [LUFS], Loudness Range [LU], True Peak [dBTP] (see [audioquality-loudness](#audioquality-loudness))
  * [Dynamic Range Value](http://dr.loudness-war.info)
  * Bitrate for lossy compression format files (MP3, OGG)
@@ -50,7 +50,7 @@ NOTE1: this is VERY slow! It is much faster to identify low-quality recordings b
 
 NOTE2: frequency on the Y axis is in linear scale, not logarithmic! This way the spectrogram does not resemble what we hear, but may help to identify high frequency issues, like incorrect use of low-pass filters.
 
-This script is a simple wrapper for _sox_.
+This script is a simple wrapper for [sox](http://sox.sourceforge.net).
 
 ---
 ## Installation
