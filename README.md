@@ -59,7 +59,7 @@ These tools are simple BASH scripts, just place or link them into your $PATH dir
 
 ### Debian
 
-    # apt-get install exiftool feh vorbis-tools sox tofrodos bc sed libebur128-dev
+    # apt-get install libimage-exiftool-perl feh vorbis-tools sox tofrodos bc sed libebur128-dev
 
 The _audiowaveform_, _dr14.tmeter_ (GPLv3) and _loudness-scanner_ (MIT) are open source tools, but unfortunately missing from the Debian repositories (Debian Testing, as of 2017-01). For audiowaveform, there is an Ubuntu Launchpad PPA. For dr14.tmeter, there are packages available for all major Linux systems. The loudness-scanner has to be compiled from source, even though the _libebur128-dev_ is available from the repository.
 
