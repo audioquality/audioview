@@ -6,6 +6,7 @@
 #
 # dependencies: audiowaveform (https://github.com/bbcrd/audiowaveform)
 #               exiftool
+#               imagemagick
 #               feh
 #               vorbis-tools
 #
@@ -27,11 +28,15 @@ if [ ! -x "$AUDIOWAVEFORM" ]; then
   echo "Error: audiowaveform not found"
   exit 1
 fi
-if [ ! -x $(which exiftool) ]; then
+if [ ! -x "$(which exiftool)" ]; then
   echo "Error: exiftool not found"
   exit 1
 fi
-if [ ! -x $(which feh) ]; then
+if [ ! -x "$(which convert)" ]; then
+  echo "Error: imagemagick not found"
+  exit 1
+fi
+if [ ! -x "$(which feh)" ]; then
   echo "Error: feh not found"
   exit 1
 fi
@@ -52,21 +57,10 @@ FNAME=$(echo -n "$SRCPATH" | sed 's/\\$/\\\\$/' | grep -Eo '[^/]+$')
 TEMPIMAGE=$(echo "$SRCPATH" | grep -Po '[^/]+/[^/]+$' | sed 's/\// - /' | sed 's/[^.]*$/png/')
 TEMPIMAGE="$CACHEDIR/$TEMPIMAGE"
 
-# get file info
-FILEINFO=$(exiftool -S "$SRCPATH" 2>/dev/null)
-SIDE=$(echo "$FILEINFO" | grep -i -m 1 Side: | sed 's/.*:\s*//')
-BITRATE=$(echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//')
-TRACKNR=$(echo "$FILEINFO" | grep -i -m 1 -E 'Track(N[^:]*r)?:' | sed 's/.*:\s*//' | sed 's/\/.*//')
-TRACKNAME=$(echo "$FILEINFO" | grep -i -m 1 Title: | sed 's/[^:]*:\s*//')
-ARTIST=$(echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//')
-ALBUM=$(echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//')
-DATE=$(echo "$FILEINFO" | grep -i -m 1 -E '^Date(TimeOriginal)?:' | sed 's/.*:\s*//')
-YEAR=$(echo "$FILEINFO" | grep -i -m 1 -E '^Year:' | sed 's/.*:\s*//')
-if [ -z "$DATE" -a -n "$YEAR" ]; then
-  DATE=$YEAR
-fi
-
 if [ ! -s "$TEMPIMAGE" ]; then
+  # get file info
+  FILEINFO=$(exiftool -S "$SRCPATH" 2>/dev/null)
+  
   DURATION=$(echo "$FILEINFO" | grep -i -m 1 Duration:)
   if [[ $DURATION =~ ([0-9]+):([0-9]+):([0-9]+) ]]; then
     LENGTH=$(expr ${BASH_REMATCH[1]} \* 3600 + ${BASH_REMATCH[2]} \* 60 + ${BASH_REMATCH[3]} + 1)
@@ -88,33 +82,44 @@ if [ ! -s "$TEMPIMAGE" ]; then
   else
     AUDIOFILE="$SRCPATH"
   fi
+    
+  # parse file info
+  SIDE=$(echo "$FILEINFO" | grep -i -m 1 Side: | sed 's/.*:\s*//')
+  BITRATE=$(echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//')
+  TRACKNR=$(echo "$FILEINFO" | grep -i -m 1 -E 'Track(N[^:]*r)?:' | sed 's/.*:\s*//' | sed 's/\/.*//')
+  TRACKNAME=$(echo "$FILEINFO" | grep -i -m 1 Title: | sed 's/[^:]*:\s*//')
+  ARTIST=$(echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//')
+  ALBUM=$(echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//')
+  DATE=$(echo "$FILEINFO" | grep -i -m 1 -E '^Date(TimeOriginal)?:' | sed 's/.*:\s*//')
+  YEAR=$(echo "$FILEINFO" | grep -i -m 1 -E '^Year:' | sed 's/.*:\s*//')
+  if [ -z "$DATE" -a -n "$YEAR" ]; then
+    DATE=$YEAR
+  fi
+  
+  # define overlay data
+  cd "$SRCDIR"
+  LINE_META=$(echo -n "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(echo -n "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(echo -n "$TRACKNAME" | sed 's/\\$/\\\\$/')
+  LINE_EBU128=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; | grep -Po '\S.*dBTP' | tr -s ' ')
+  LINE_DR=$(find \( -iname dr14.txt -o -iname foo_dr.txt \) -exec sh -c "grep -E \"DR.*\s0?$TRACKNR\s*\-\" '{}' " \; | grep -Fi "$TRACKNAME" | grep -Po 'DR\d+' | head -n 1)
   
   # generate png file
-  $AUDIOWAVEFORM -i "$AUDIOFILE" -o "$TEMPIMAGE" --pixels-per-second $PIXELS_PER_SECOND -w $WIDTH -h 512 --compression 5 --background-color 000000 --border-color 996666 --axis-label-color BBBBBB
+  $AUDIOWAVEFORM -i "$AUDIOFILE" -o "$TEMPIMAGE" --pixels-per-second $PIXELS_PER_SECOND \
+  -w $WIDTH -h 512 --compression 5 --background-color 000000 --border-color 996666 --axis-label-color BBBBBB
+  
+  # put overlay into png
+  convert -pointsize 15 -fill white \
+  -draw "text 10,460 '$LINE_META'" \
+  -draw "text 10,478 '$LINE_EBU128'" \
+  -draw "text 10,496 '$LINE_DR'" "$TEMPIMAGE" "$TEMPIMAGE"
+  
+  # clean up
+  rm "$TEMPIMAGE"*wav 2>/dev/null
+  
 fi
 
-# read dynamic range info from dr14.txt if available
-cd "$SRCDIR"
-# read loudness range from loudness.txt if available
-LU=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; | grep -Po '\S.*dBTP' | tr -s ' ')
-# get DR
-DR=$(find \( -iname dr14.txt -o -iname foo_dr.txt \) -exec sh -c "grep -E \"DR.*\s0?$TRACKNR\s*\-\" '{}' " \; | grep -Fi "$TRACKNAME" | grep -Po 'DR\d+' | head -n 1)
-
-# prepare metadata info for display
-#INFO=" "$(echo $TEMPIMAGE | sed 's/.*\///')"
-# "$(echo -n "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(echo -n "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(echo -n "$TRACKNAME" | sed 's/\\$/\\\\$/')"
-# $LU
-# $DR
-# $BITRATE"
-INFO=" "$(echo -n "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(echo -n "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(echo -n "$TRACKNAME" | sed 's/\\$/\\\\$/')"
- $LU
- $DR
- $BITRATE"
 # view waveform
-feh --borderless --info "echo \"$INFO\"" --no-menus "$TEMPIMAGE" 2>/dev/null &
+feh --borderless --no-menus "$TEMPIMAGE" 2>/dev/null &
 
-# clean up
-rm "$TEMPIMAGE"*wav 2>/dev/null
 # delete old files from cache
 find "$CACHEDIR" -maxdepth 1 -type f -mtime +30 -delete 2>/dev/null
 
