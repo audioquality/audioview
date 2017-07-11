@@ -107,10 +107,11 @@ if [ ! -s "$TEMPIMAGE" ]; then
   -w $WIDTH -h 512 --compression 5 --background-color 000000 --border-color 996666 --axis-label-color BBBBBB
   
   # put overlay into png
-  convert -pointsize 15 -fill white \
-  -draw "text 10,460 '$LINE_META'" \
-  -draw "text 10,478 '$LINE_EBU128'" \
-  -draw "text 10,496 '$LINE_DR'" "$TEMPIMAGE" "$TEMPIMAGE"
+  convert -pointsize 14 -fill white \
+  -draw "text 10,456 '$LINE_META'" \
+  -draw "text 10,473 '$LINE_EBU128'" \
+  -draw "text 10,491 '$LINE_DR'" \
+  -draw "text 10,508 '$BITRATE'" "$TEMPIMAGE" "$TEMPIMAGE"
   
   # clean up
   rm "$TEMPIMAGE"*wav 2>/dev/null
