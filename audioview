@@ -108,7 +108,7 @@ if [ ! -s "$TEMPIMAGE" ]; then
   
   # put overlay into png
   convert -pointsize 14 -fill white \
-  -draw "text 10,456 '$LINE_META'" \
+  -draw "text 10,456 \"$LINE_META\"" \
   -draw "text 10,473 '$LINE_EBU128'" \
   -draw "text 10,491 '$LINE_DR'" \
   -draw "text 10,508 '$BITRATE'" "$TEMPIMAGE" "$TEMPIMAGE"

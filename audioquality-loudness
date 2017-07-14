@@ -15,26 +15,26 @@
 #
 LFILE="loudness.txt"
 
-if [ ! -x `which loudness` ]; then
+if [ ! -x "$(which loudness)" ]; then
   echo -e "Missing the 'loudness' scanner.\nInstall from here: https://github.com/jiixyj/loudness-scanner"
   exit 1
 fi
 
 # find one audio file
-AUDIOFILE=`find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f' -quit`
+AUDIOFILE=$(find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f' -quit)
 if [ ! -s "$AUDIOFILE" ]; then
   echo "No audio file found in the working directory, exiting."
   exit 1
 fi
-CNTFILES=`find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f\n' | wc -l`
+CNTFILES=$(find -maxdepth 1 -type f \( -iname '*flac' -o -iname '*mp3' -o -iname '*ogg' -o -iname '*wav' \) -printf '%f\n' | wc -l)
 
 echo -n "Analyzing audio loudness... "
-FILEINFO=`exiftool -S "$AUDIOFILE" 2>/dev/null`
-ARTIST=`echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//'`
-ALBUM=`echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//'`
-BITRATE=`echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//'`
-SAMPLERATE=`echo "$FILEINFO" | grep -i -m 1 SampleRate: | sed 's/.*:\s*//'`
-BITSPS=`echo "$FILEINFO" | grep -i -m 1 BitsPerSample: | sed 's/.*:\s*//'`
+FILEINFO=$(exiftool -S "$AUDIOFILE" 2>/dev/null)
+ARTIST=$(echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//')
+ALBUM=$(echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//')
+BITRATE=$(echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//')
+SAMPLERATE=$(echo "$FILEINFO" | grep -i -m 1 SampleRate: | sed 's/.*:\s*//')
+BITSPS=$(echo "$FILEINFO" | grep -i -m 1 BitsPerSample: | sed 's/.*:\s*//')
 
 echo "----------------------------------------------------------------------------------------------" >$LFILE
 echo " Analyzed: $ALBUM / Artist: $ARTIST" >>$LFILE
@@ -61,7 +61,7 @@ loudness --version | sed 's/^/ /' >>$LFILE
 echo "==============================================================================================" >>$LFILE
 # make line endings DOS compatible LF->CRLF
 #sed -i 's/$/\x0D/g' "$LFILE"
-if [ -x `which todos` ]; then
+if [ -x "$(which todos)" ]; then
   todos "$LFILE"
 fi
 
