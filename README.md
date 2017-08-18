@@ -32,7 +32,7 @@ It is a wrapper around [audiowaveform](https://github.com/bbc/audiowaveform), [e
 Audioview uses _loudness.txt_ file to display the loudness information, and _dr14.txt_ or _foo_dr.txt_ to display the DR value. These files can be saved in the same directory as the viewed file or in a subdirectory, _audioview_ will find them. To speed up repeated view, it maintains a local cache in _$HOME/.cache/audioview_.
 In case of an error there is no visual notification, an error message might appear on the terminal.
 
-###audioquality-loudness###
+###aq-loudness###
 generates [EBU-R128](https://tech.ebu.ch/loudness) loudness report for all audio files in current directory and saves it to _loudness.txt_ file. This is later used by audioview to display loudness metadata in the overlay. It is meant to be run from the terminal. The output formatting is made to look similar to a DR14 report file.
 
 The results contain:
@@ -43,12 +43,12 @@ The results contain:
 
 It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-scanner). For more on loudness and the EBU-R128 parameters, see: https://www.youtube.com/watch?v=iuEtQqC-Sqo
 
-###audioquality-spectrogram###
+###aq-spectrogram###
 generates a single spectrogram, for all _flac_ files in current directory combined. The the color map resolution is 96dB to represent the full scale of 16 bit audio.  The time resolution is constant; 1s of audio per pixel on the X axis. The Y axis shows frequency up to 22 kHz to match the [CD sampling rate](https://en.wikipedia.org/wiki/Compact_Disc_Digital_Audio#Sample_rate).
 
 NOTE1: this is VERY slow! It is much faster to identify low-quality recordings by a quick look at [audioview](#audioview-1).
 
-NOTE2: frequency on the Y axis is in linear scale, not logarithmic! This way the spectrogram does not resemble what we hear, but may help to identify high frequency issues, like incorrect use of low-pass filters.
+NOTE2: frequency on the Y axis is in linear scale, not logarithmic! This way the spectrogram does not resemble what we hear, but helps to identify high frequency issues like aliasing.
 
 This script is a simple wrapper for [sox](http://sox.sourceforge.net).
 
@@ -90,18 +90,18 @@ The workaround is to disable the ffmpeg input, compile, and then copy the binari
 ## Usage
 
 
-###audioquality-loudness###
+###aq-loudness###
 
-Syntax: ```$ audioquality-loudness```
+Syntax: ```$ aq-loudness```
 
 
-###audioquality-spectrogram###
+###aq-spectrogram###
 
-Syntax: ```$ audioquality-spectrogram```
+Syntax: ```$ aq-spectrogram```
 
 **Example:**
 
-Running the script in a directory with 2 example files, different versions of the same song (Bon Jovi - Bad Medicine). The first half of the spectrogram shows the version released in 1988: no high frequency issues, all is kept nicely below 21 kHz to avoid aliasing distortion. The second half shows the 2010 remastered version: The high frequencies go all the way to the top during the whole song; in this case it was caused by careless digital clipping.
+Running the script in a directory with 2 example files, different versions of the same song (Bon Jovi - Bad Medicine). The first half of the spectrogram shows the version released in 1988: no high frequency issues, all is kept nicely below 21 kHz to avoid aliasing distortion. The second half shows the 2010 remastered version: The high frequencies go all the way to the top during the whole song. This anomaly in the remastered version was caused by careless digital clipping.
 ![](doc/badmedicine-spectrogram.png)
 
 
@@ -116,13 +116,13 @@ Syntax:
 Show the difference between the original and the remastered release:
 
     $ audioview "02 - Bad Medicine.flac"
-    $ audioview "CD1 - 06 - Bad Medicine.flac
+    $ audioview "CD1 - 06 - Bad Medicine.flac"
 
 Original version released in 1988. Beautiful [DR13](http://dr.loudness-war.info/) dynamics, no clipping issues, lively and enjoyable sound:
-[ ![](doc/badmedicine1988s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine1988.png)
+[ ![](doc/badmedicine1988s.png) ](https://raw.githubusercontent.com/audioquality/audioview/master/doc/badmedicine1988.png)
 
-Same song, remastered in 2010, dynamically compressed and clipped. This low-quality bricked release sounds in comparison [wimpy, small, distorted](https://youtu.be/u9Fb3rWNWDA?t=859) and boring:
-[ ![](doc/badmedicine2010s.png) ](https://raw.githubusercontent.com/clixt/audioquality/master/doc/badmedicine2010.png)
+The same song, remastered in 2010, dynamically compressed and clipped. This low-quality bricked release sounds in comparison [wimpy, small, distorted](https://youtu.be/u9Fb3rWNWDA?t=859) and boring:
+[ ![](doc/badmedicine2010s.png) ](https://raw.githubusercontent.com/audioquality/audioview/master/doc/badmedicine2010.png)
 
 ---
 ## License
@@ -134,9 +134,9 @@ as published by Sam Hocevar. See http://www.wtfpl.net for more details.
 ## Contributing
 
 If you want to report a bug, we'd be happy to hear
-from you. Please either [raise an issue](https://github.com/clixt.net/audioquality/issues), or fork the project and send us a pull request.
+from you. Please either [raise an issue](https://github.com/audioquality/audioview/issues), or fork the project and send us a pull request.
 
 ## Authors
 
-This software was written by [ClixT](dev@clixt.net)
+This software was written by (dev@audioquality.org)
 
