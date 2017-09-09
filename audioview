@@ -100,12 +100,17 @@ if [ ! -s "$TEMPIMAGE" ]; then
   # define overlay data
   cd "$SRCDIR"
   LINE_META=$(echo -n "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(echo -n "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(echo -n "$TRACKNAME" | sed 's/\\$/\\\\$/')
-  LINE_EBU128=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; | grep -Po '\S.*dBTP' | tr -s ' ')
+  LINE_EBU128=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; | grep -Po '\S.*dBTP' | tr -s ' ' | head -n 1)
   LINE_DR=$(find \( -iname dr14.txt -o -iname foo_dr.txt \) -exec sh -c "grep -E \"DR.*\s0?$TRACKNR\s*\-\" '{}' " \; | grep -Fi "$TRACKNAME" | grep -Po 'DR\d+' | head -n 1)
   
   # generate png file
   $AUDIOWAVEFORM -i "$AUDIOFILE" -o "$TEMPIMAGE" --pixels-per-second $PIXELS_PER_SECOND \
   -w $WIDTH -h 512 --compression 5 --background-color 000000 --border-color 996666 --axis-label-color BBBBBB
+  
+  if [ ! -s "$TEMPIMAGE" ]; then
+    echo "FAIL: Audiowaveform file was not generated."
+    exit 1
+  fi
   
   # put overlay into png
   convert -pointsize 14 -fill white \
