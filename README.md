@@ -14,11 +14,11 @@ There is a lot of theory out there. Subjective opinions, music industry myths, a
 ... so how can you find out what recordings have the potential to sound good?
 
 ---
-##About##
+## About
 
 These Linux tools will help you to get a better understanding of your music collection and the quality of locally stored audio. You can visually compare different songs and album releases, easily identify common cases of audio abuse, like dynamic range compression, limiting and clipping. The results can create a base for reviews of released albums from the audio quality perspective.
 
-###audioview###
+### audioview
 shows a simplified waveform, in 200ms per pixel constant time resolution, of a given 16bit/44.1kHz single audio file (WAV, FLAC, MP3, OGG). Additional information about the audio quality is displayed as an overlay. It is meant to be associated with audio files in a file manager, in an audio player, or run directly from the terminal.
 
 Displayed metadata overlay is in the form of:
@@ -32,7 +32,7 @@ It is a wrapper around [audiowaveform](https://github.com/bbc/audiowaveform), [e
 Audioview uses _loudness.txt_ file to display the loudness information, and _dr14.txt_ or _foo_dr.txt_ to display the DR value. These files can be saved in the same directory as the viewed file or in a subdirectory, _audioview_ will find them. To speed up repeated view, it maintains a local cache in _$HOME/.cache/audioview_.
 In case of an error there is no visual notification, an error message might appear on the terminal.
 
-###aq-loudness###
+### aq-loudness
 generates [EBU-R128](https://tech.ebu.ch/loudness) loudness report for all audio files in current directory and saves it to _loudness.txt_ file. This is later used by audioview to display loudness metadata in the overlay. It is meant to be run from the terminal. The output formatting is made to look similar to a DR14 report file.
 
 The results contain:
@@ -43,7 +43,7 @@ The results contain:
 
 It is a wrapper around [loudness-scanner](https://github.com/jiixyj/loudness-scanner). For more on loudness and the EBU-R128 parameters, see: https://www.youtube.com/watch?v=iuEtQqC-Sqo
 
-###aq-spectrogram###
+### aq-spectrogram
 generates a single spectrogram, for all _flac_ files in current directory combined. The the color map resolution is 96dB to represent the full scale of 16 bit audio.  The time resolution is constant; 1s of audio per pixel on the X axis. The Y axis shows frequency up to 22 kHz to match the [CD sampling rate](https://en.wikipedia.org/wiki/Compact_Disc_Digital_Audio#Sample_rate).
 
 NOTE1: this is VERY slow! It is much faster to identify low-quality recordings by a quick look at [audioview](#audioview-1).
@@ -90,12 +90,12 @@ The workaround is to disable the ffmpeg input, compile, and then copy the binari
 ## Usage
 
 
-###aq-loudness###
+### aq-loudness
 
 Syntax: ```$ aq-loudness```
 
 
-###aq-spectrogram###
+### aq-spectrogram
 
 Syntax: ```$ aq-spectrogram```
 
@@ -105,7 +105,7 @@ Running the script in a directory with 2 example files, different versions of th
 ![](doc/badmedicine-spectrogram.png)
 
 
-###audioview###
+### audioview
 
 Syntax:
 
