@@ -101,7 +101,7 @@ Syntax: ```$ aq-spectrogram```
 
 **Example:**
 
-Running the script in a directory with 2 example files, different versions of the same song (Bon Jovi - Bad Medicine). The first half of the spectrogram shows the version released in 1988: no high frequency issues, all is kept nicely below 21 kHz to avoid aliasing distortion. The second half shows the 2010 remastered version: The high frequencies go all the way to the top during the whole song. This anomaly in the remastered version was caused by careless digital clipping.
+Running the script in a directory with 2 example files, different versions of the same song (Bon Jovi - Bad Medicine). The first half of the spectrogram shows the version released in 1988: no high frequency issues, all is kept nicely below 21 kHz to avoid aliasing. The second half shows the 2010 remastered version: High frequencies go all the way to the top. This anomaly in the remastered version was caused by careless digital clipping.
 ![](doc/badmedicine-spectrogram.png)
 
 

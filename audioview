@@ -19,65 +19,77 @@
 #
 ################################################################################################
 # full path to audiowaveform binary:
-AUDIOWAVEFORM=$(which audiowaveform)
+AUDIOWAVEFORM=$(command -v audiowaveform)
 # audiowaveform x-axis resolution
 PIXELS_PER_SECOND=5
-# preview cache directory
-CACHEDIR=~/.cache/audioview
+# preview cache subdirectory
+CACHEDIR=audioview
 
 if [ ! -x "$AUDIOWAVEFORM" ]; then
-  echo "Error: audiowaveform not found"
+  printf "Error: audiowaveform not found\n"
   exit 1
 fi
-if [ ! -x "$(which exiftool)" ]; then
-  echo "Error: exiftool not found"
+if [ ! -x "$(command -v exiftool)" ]; then
+  printf "Error: exiftool not found\n"
   exit 1
 fi
-if [ ! -x "$(which convert)" ]; then
-  echo "Error: imagemagick not found"
+if [ ! -x "$(command -v convert)" ]; then
+  printf "Error: imagemagick not found\n"
   exit 1
 fi
-if [ ! -x "$(which feh)" ]; then
-  echo "Error: feh not found"
+if [ ! -x "$(command -v feh)" ]; then
+  printf  "Error: feh not found\n"
   exit 1
-fi
-
-if [ ! -d "$CACHEDIR" ]; then
-  mkdir "$CACHEDIR"
-  if [ ! -d "$CACHEDIR" ]; then
-    echo "Error: cache $CACHEDIR cannot be created"
-    exit 1
-  fi
 fi
 
 SRCPATH=$(readlink -f "$1")
 SRCDIR=$(dirname "$SRCPATH")
-FNAME=$(echo -n "$SRCPATH" | sed 's/\\$/\\\\$/' | grep -Eo '[^/]+$')
+FNAME=$(printf "%s" "$SRCPATH" | sed 's/\\$/\\\\$/' | grep -o '[^/]*$')
 
-# temp png image file
-TEMPIMAGE=$(echo "$SRCPATH" | grep -Po '[^/]+/[^/]+$' | sed 's/\// - /' | sed 's/[^.]*$/png/')
-TEMPIMAGE="$CACHEDIR/$TEMPIMAGE"
+# Audio file must exist
+[ -r "$SRCPATH" ] || exit
 
+CACHEPATH="$SRCDIR/$CACHEDIR"
+if [ ! -d "$CACHEPATH" ]; then
+  mkdir "$CACHEPATH" 2>/dev/null
+  if [ ! -d "$CACHEPATH" ]; then
+    CACHEPATH=~/.cache/"$CACHEDIR"
+    if [ ! -d "$CACHEPATH" ]; then
+      mkdir "$CACHEPATH" 2>/dev/null
+      if [ ! -d "$CACHEPATH" ]; then
+        printf "Error: cache $CACHEPATH cannot be created\n"
+        exit 1
+      fi
+      # PNG filename as dirname+audiofile name, with extension replaced
+      TEMPIMAGE="$CACHEPATH/$(printf "%s" "$SRCPATH" | grep -Eo '[^/]+/[^/]+$' | sed 's/\// - /' | sed 's/[^.]*$/png/')"
+    fi
+  fi
+fi
+
+# PNG filename same as audio file name, with extension replaced
+[ -z "$TEMPIMAGE" ] && TEMPIMAGE="$CACHEPATH/$(printf "%s" "$FNAME" | sed 's/[^.]*$/png/')"
+
+# Generate Audio View PNG, if it doesn't exist
 if [ ! -s "$TEMPIMAGE" ]; then
   # get file info
   FILEINFO=$(exiftool -S "$SRCPATH" 2>/dev/null)
   
-  DURATION=$(echo "$FILEINFO" | grep -i -m 1 Duration:)
+  DURATION=$(printf "%s" "$FILEINFO" | grep -i -m 1 Duration:)
   if [[ $DURATION =~ ([0-9]+):([0-9]+):([0-9]+) ]]; then
     LENGTH=$(expr ${BASH_REMATCH[1]} \* 3600 + ${BASH_REMATCH[2]} \* 60 + ${BASH_REMATCH[3]} + 1)
   elif [[ $DURATION =~ ([0-9]+)\.[0-9]+.*s ]]; then
     LENGTH=$(expr ${BASH_REMATCH[1]} + 1)
   fi
   # check audio length
-  if [[ -z $LENGTH ]]; then
-    echo "Cannot determine length of audio file"
+  if [ -z "$LENGTH" ]; then
+    printf "Cannot determine length of audio file\n"
     exit 1
   fi
   # calculate required png width in pixels
   WIDTH=$(expr $LENGTH \* $PIXELS_PER_SECOND)
   
   # detect ogg and convert to wav (ogg support for audiowaveform)
-  if [[ $(file "$SRCPATH" | grep -c "Vorbis audio") -eq 1 ]]; then
+  if $(file "$SRCPATH" | grep -q "Vorbis audio"); then
     AUDIOFILE=$TEMPIMAGE.wav
     oggdec -o "$AUDIOFILE" "$SRCPATH" 2>/dev/null
   else
@@ -85,30 +97,30 @@ if [ ! -s "$TEMPIMAGE" ]; then
   fi
     
   # parse file info
-  SIDE=$(echo "$FILEINFO" | grep -i -m 1 Side: | sed 's/.*:\s*//')
-  BITRATE=$(echo "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//')
-  TRACKNR=$(echo "$FILEINFO" | grep -i -m 1 -E 'Track(N[^:]*r)?:' | sed 's/.*:\s*//' | sed 's/\/.*//')
-  TRACKNAME=$(echo "$FILEINFO" | grep -i -m 1 Title: | sed 's/[^:]*:\s*//')
-  ARTIST=$(echo "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//')
-  ALBUM=$(echo "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//')
-  DATE=$(echo "$FILEINFO" | grep -i -m 1 -E '^Date(TimeOriginal)?:' | sed 's/.*:\s*//')
-  YEAR=$(echo "$FILEINFO" | grep -i -m 1 -E '^Year:' | sed 's/.*:\s*//')
+  SIDE=$(printf "%s" "$FILEINFO" | grep -i -m 1 Side: | sed 's/.*:\s*//')
+  BITRATE=$(printf "%s" "$FILEINFO" | grep -i -m 1 AudioBitrate: | sed 's/.*:\s*//')
+  TRACKNR=$(printf "%s" "$FILEINFO" | grep -i -m 1 -E 'Track(N[^:]*r)?:' | sed 's/.*:\s*//' | sed 's/\/.*//')
+  TRACKNAME=$(printf "%s" "$FILEINFO" | grep -i -m 1 Title: | sed 's/[^:]*:\s*//')
+  ARTIST=$(printf "%s" "$FILEINFO" | grep -i -m 1 Artist: | sed 's/[^:]*:\s*//')
+  ALBUM=$(printf "%s" "$FILEINFO" | grep -i -m 1 Album: | sed 's/[^:]*:\s*//')
+  DATE=$(printf "%s" "$FILEINFO" | grep -i -m 1 -E '^Date(TimeOriginal)?:' | sed 's/.*:\s*//')
+  YEAR=$(printf "%s" "$FILEINFO" | grep -i -m 1 -E '^Year:' | sed 's/.*:\s*//')
   if [ -z "$DATE" -a -n "$YEAR" ]; then
     DATE=$YEAR
   fi
   
   # define overlay data
   cd "$SRCDIR"
-  LINE_META=$(echo -n "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(echo -n "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(echo -n "$TRACKNAME" | sed 's/\\$/\\\\$/')
-  LINE_EBU128=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; | grep -Po '\S.*dBTP' | tr -s ' ' | head -n 1)
-  LINE_DR=$(find \( -iname dr14.txt -o -iname foo_dr.txt \) -exec sh -c "grep -E \"DR.*\s0?$TRACKNR\s*\-\" '{}' " \; | grep -Fi "$TRACKNAME" | grep -Po 'DR\d+' | head -n 1)
+  LINE_META=$(printf "%s" "$ARTIST" | sed 's/\\$/\\\\$/')" - "$(printf "%s" "$ALBUM" | sed 's/\\$/\\\\$/')" ($DATE) - $SIDE$TRACKNR - "$(printf "%s" "$TRACKNAME" | sed 's/\\$/\\\\$/')
+  LINE_EBU128=$(find -iname loudness.txt -exec sh -c "grep -o \".*$FNAME\" '{}' " \; -quit | grep -Po '\S.*dBTP' | tr -s ' ' | head -n 1)
+  LINE_DR=$(find \( -iname dr14.txt -o -iname foo_dr.txt \) -exec sh -c "grep -E \"DR.*\s0?$TRACKNR\s*\-\" '{}' " \; | grep -Fi "$(printf "%s" "$TRACKNAME" | sed 's/[?!*]//')" | grep -Eo 'DR[0-9]+' | head -n 1)
   
   # generate png file
   $AUDIOWAVEFORM -i "$AUDIOFILE" -o "$TEMPIMAGE" --pixels-per-second $PIXELS_PER_SECOND \
   -w $WIDTH -h 512 --compression 5 --background-color 000000 --border-color 996666 --axis-label-color BBBBBB
   
   if [ ! -s "$TEMPIMAGE" ]; then
-    echo "FAIL: Audiowaveform file was not generated."
+    printf "FAIL: Audiowaveform file was not generated.\n"
     exit 1
   fi
   
@@ -127,7 +139,7 @@ fi
 # view waveform
 feh --borderless --no-menus "$TEMPIMAGE" 2>/dev/null &
 
-# delete old files from cache
-find "$CACHEDIR" -maxdepth 1 -type f -mtime +30 -delete 2>/dev/null
+# delete old files from user cache
+[ -d ~/.cache/"$CACHEDIR" ] && find ~/.cache/"$CACHEDIR" -maxdepth 1 -type f -mtime +30 -delete 2>/dev/null
 
-exit 0
+exit
