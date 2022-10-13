@@ -124,8 +124,11 @@ if [ ! -s "$TEMPIMAGE" ]; then
     exit 1
   fi
   
+  # find font
+  FONT="$(find /usr/share/fonts -name 'DejaVuSansMono.ttf' -printf '%p' -quit)"
+  [ -z "$FONT" ] && FONT="$(find /usr/share/fonts -name 'Inconsolata.otf' -printf '%p' -quit)"
   # put overlay into png
-  convert -pointsize 14 -fill white \
+  convert -pointsize 15 -fill white -font "$FONT" \
   -draw "text 10,456 \"$LINE_META\"" \
   -draw "text 10,473 '$LINE_EBU128'" \
   -draw "text 10,491 '$LINE_DR'" \
@@ -137,7 +140,7 @@ if [ ! -s "$TEMPIMAGE" ]; then
 fi
 
 # view waveform
-feh --borderless --no-menus "$TEMPIMAGE" 2>/dev/null &
+feh --borderless --no-menus --no-screen-clip "$TEMPIMAGE" 2>/dev/null &
 
 # delete old files from user cache
 [ -d ~/.cache/"$CACHEDIR" ] && find ~/.cache/"$CACHEDIR" -maxdepth 1 -type f -mtime +30 -delete 2>/dev/null
